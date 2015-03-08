@@ -1,5 +1,5 @@
 /// <reference path="../../typings/tsd.d.ts" />
-var apiUrl = 'http://localhost:3000';
+var apiUrl = '//'+location.hostname+':3000';
 // Declare app level module which depends on views, and components
 var recptr = angular.module('recptr', [
     'ngRoute', 'ngMaterial', 'ngResource', 'naif.base64', 'ngMdIcons'
