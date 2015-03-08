@@ -33,6 +33,7 @@ recptr.factory('Resource', ['$resource', '$rootScope', '$location', function ($r
         resource.prototype.$save = function () {
             if (!this.id) {
                 return this.$create(function(){
+                $rootScope.loadData();
                 $location.path('/');
                 });
             }
