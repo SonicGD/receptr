@@ -2,7 +2,8 @@
 
     <md-card-content>
         <h1>{{recipe.Title}}</h1>
-        <img ng-src="data:{{recipe.Picture.filetype}};base64,{{recipe.Picture.base64}}" alt=""
+        <img ng-src="data:{{recipe.Picture.filetype}};base64,{{recipe.Picture.base64}}" ng-if="recipe.Picture.base64"
+             alt=""
              style="max-width: 100%; max-height: 200px">
 
         <div>{{recipe.Description}}</div>
