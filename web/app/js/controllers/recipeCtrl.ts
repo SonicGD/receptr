@@ -33,8 +33,9 @@ var recipeCtrl = recptr.controller('recipeCtrl', function ($scope, Recipe, $rout
     };
 
     $scope.delete = function () {
-            $scope.recipe.delete();
-            $location.path('/');
+            Recipe.delete({id: $scope.recipe.id}, function (data) {
+                $location.path('/');
+            });
         };
 
     $scope.addIngredient = function () {
