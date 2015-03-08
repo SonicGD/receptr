@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="recptr">
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Recptr</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/angular-material/angular-material.min.css">
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body layout="row">
+<md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2 md-closed ng-isolate-scope md-locked-open"
+            md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')" tabindex="-1">
+    <md-toolbar layout="row">
+        <button ng-click="toggleSidenav('left')" hide-gt-sm class="menuBtn">
+            <span class="visually-hidden">Menu</span>
+        </button>
+        <h1 class="md-toolbar-tools"><a href="/">Recptr</a></h1>
+    </md-toolbar>
+    <ul class="main-menu">
+        <li ng-repeat="recipe in recipes">
+            <md-button href="/recipes/{{recipe.id}}">{{recipe.Title}}</md-button>
+        </li>
+    </ul>
+    <md-button ng-click="getRandom()">Случайный рецепт</md-button>
+    <md-button href="/recipes">Добавить рецепт</md-button>
+</md-sidenav>
+<div layout="column" tabIndex="-1" role="main" flex>
+    <md-toolbar class="md-default-theme">
+    </md-toolbar>
+    <md-content layout="column" flex class="md-padding">
+        <main ng-view></main>
+    </md-content>
+</div>
+
+<script src="/assets/angular/angular.min.js"></script>
+<script src="/assets/angular-route/angular-route.min.js"></script>
+<script src="/assets/angular-aria/angular-aria.min.js"></script>
+<script src="/assets/angular-animate/angular-animate.min.js"></script>
+<script src="/assets/angular-resource/angular-resource.min.js"></script>
+<script src="/assets/angular-material/angular-material.min.js"></script>
+<script src="/assets/angular-messages/angular-messages.min.js"></script>
+<script src="/assets/angular-material-icons/angular-material-icons.min.js"></script>
+<script src="/assets/angular-base64-upload/dist/angular-base64-upload.min.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/controllers/mainCtrl.js"></script>
+<script src="/js/controllers/recipeCtrl.js"></script>
+</body>
+</html>

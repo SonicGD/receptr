@@ -1,0 +1,93 @@
+<form name="recipeForm">
+    <md-input-container>
+        <label>Название</label>
+        <input name="recipeTitle" type="text" ng-model="recipe.Title" required/>
+
+        <div ng-messages="recipeForm.recipeTitle.$error" ng-show="recipeForm.recipeTitle.$dirty">
+            <div ng-message="required">Обязательное поле!</div>
+        </div>
+    </md-input-container>
+    <md-input-container>
+        <label>Описание</label>
+        <textarea name="recipeDescription" ng-model="recipe.Description"></textarea>
+    </md-input-container>
+    <md-input-container>
+        <input ng-show="false" id="recipePic" type="file" ng-model="recipe.Picture" name="file" base-sixty-four-input>
+        <img ng-if="recipe.Picture.base64" ng-click="showFileDialog('recipePic')"
+             ng-src="data:{{recipe.Picture.filetype}};base64,{{recipe.Picture.base64}}" alt="" style="max-width: 200px">
+        <a href="" ng-click="showFileDialog('recipePic')" ng-if="!recipe.Picture.base64">Загрузить
+            картинку</a>
+    </md-input-container>
+    <div>
+        <h2>Ингредиенты</h2>
+        <md-whiteframe class="md-whiteframe-z1" layout layout-align="center center"
+                       ng-repeat="(key,ingredient) in recipe.Ingredients">
+
+            <div class="close" ng-click="removeIngredient(key)"><ng-md-icon icon="close"></ng-md-icon></div>
+            <div flex="10">Ингредиент №{{key+1}}</div>
+            <div flex="90">
+                <md-input-container>
+                    <label>Описание</label>
+                    <input type="text" ng-model="ingredient.Title" required/>
+                </md-input-container>
+                <md-input-container>
+                    <label>Количество</label>
+                    <input type="text" ng-model="ingredient.HowMuch" required/>
+                </md-input-container>
+            </div>
+            <hr/>
+        </md-whiteframe>
+        <p ng-if="recipe.Ingredients.length==0">Нет ингредиентов</p>
+
+        <div style="text-align: right">
+            <md-button ng-click="addIngredient()">
+                Добавить ингредиент
+            </md-button>
+        </div>
+    </div>
+    <div>
+        <h2>Приготовление</h2>
+
+        <md-whiteframe class="md-whiteframe-z1" layout layout-align="center center"
+                       ng-repeat="(key,step) in recipe.Steps">
+
+            <div flex="10">Шаг №{{key+1}}</div>
+            <div flex="90">
+                <div class="close" ng-click="removeStep(key)"><ng-md-icon icon="close"></ng-md-icon></div>
+                <md-input-container>
+                    <label>Название</label>
+                    <input type="text" name="stepTitle{{key}}" ng-model="step.Title" required/>
+
+                    <div ng-messages="recipeForm.stepTitle{{key}}.$error" ng-show="recipeForm.stepTitle{{key}}.$dirty">
+                        <div ng-message="required">Обязательное поле!</div>
+                    </div>
+                </md-input-container>
+                <md-input-container>
+                    <input ng-show="false" type="file" ng-model="step.Picture" id="stepPic{{key}}"
+                           base-sixty-four-input>
+                    <img ng-if="step.Picture.base64" ng-click="showFileDialog('stepPic'+key)"
+                         ng-src="data:{{step.Picture.filetype}};base64,{{step.Picture.base64}}" alt=""
+                         style="max-width: 200px">
+                    <a href="" ng-click="showFileDialog('stepPic'+key)" ng-if="!step.Picture.base64">Загрузить
+                        картинку</a>
+                </md-input-container>
+                <md-input-container>
+                    <label>Описание</label>
+                    <textarea ng-model="step.Html"></textarea>
+                </md-input-container>
+            </div>
+            <hr/>
+        </md-whiteframe>
+        <p ng-if="recipe.Steps.length==0">Нет шагов</p>
+
+        <div style="text-align: right">
+            <md-button ng-click="addStep()">
+                Добавить шаг
+            </md-button>
+        </div>
+    </div>
+
+    <md-button ng-disabled="recipeForm.$invalid" ng-click="save()">
+        Сохранить
+    </md-button>
+</form>
