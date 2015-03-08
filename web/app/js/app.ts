@@ -19,7 +19,7 @@ var buildWhen = function (templateUrl, controllerName = null) {
     };
 };
 
-recptr.factory('Resource', ['$resource', '$rootScope', function ($resource, $rootScope) {
+recptr.factory('Resource', ['$resource', '$rootScope', '$location', function ($resource, $rootScope, $location) {
     return function (url, params, methods) {
         var defaults = {
             update: {method: 'put', isArray: false},
@@ -32,7 +32,9 @@ recptr.factory('Resource', ['$resource', '$rootScope', function ($resource, $roo
 
         resource.prototype.$save = function () {
             if (!this.id) {
-                return this.$create();
+                return this.$create(function(){
+                $location.path('/');
+                });
             }
             else {
                 return this.$update(function (data) {
