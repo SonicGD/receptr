@@ -1,4 +1,4 @@
-var recipeCtrl = recptr.controller('recipeCtrl', function ($scope, Recipe, $routeParams, $route, $timeout) {
+var recipeCtrl = recptr.controller('recipeCtrl', function ($scope, Recipe, $routeParams, $route, $timeout, $location) {
     if ($routeParams.id) {
         Recipe.get({id: $routeParams.id}, function (data) {
             $scope.recipe = data;
@@ -31,6 +31,11 @@ var recipeCtrl = recptr.controller('recipeCtrl', function ($scope, Recipe, $rout
     $scope.save = function () {
         $scope.recipe.$save();
     };
+
+    $scope.delete = function () {
+            $scope.recipe.delete();
+            $location.path('/');
+        };
 
     $scope.addIngredient = function () {
         $scope.recipe.Ingredients.push({Title: '', HowMuch: ''})
