@@ -28,7 +28,7 @@
                     </div>
                     <div class="md-tile-content">
                         <h3>{{step.Title}}</h3>
-                        <img ng-src="data:{{step.Picture.filetype}};base64,{{step.Picture.base64}}" alt=""
+                        <img ng-if="step.Picture.base64" ng-src="data:{{step.Picture.filetype}};base64,{{step.Picture.base64}}" alt=""
                              style="max-width: 100%; max-height: 200px">
 
                         <div>
