@@ -19,7 +19,7 @@ func main() {
     m := martini.New()
     m.Use(MapEncoder)
     m.Use(cors.Allow(&cors.Options{
-        AllowOrigins:     []string{"http://recptr.dev", "http://recptr.sonicgd.ru"},
+        AllowOrigins:     []string{"http://recptr.dev", "http://receptr.sonicgd.ru"},
         AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "DELETE", "OPTIONS"},
         /*
           AllowHeaders:     []string{"Origin"},
