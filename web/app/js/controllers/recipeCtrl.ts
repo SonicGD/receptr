@@ -1,4 +1,4 @@
-var recipeCtrl = recptr.controller('recipeCtrl', function ($scope, Recipe, $routeParams, $route, $timeout, $location) {
+var recipeCtrl = recptr.controller('recipeCtrl', function ($scope, Recipe, $routeParams, $route, $timeout, $location, $rootScope) {
     if ($routeParams.id) {
         Recipe.get({id: $routeParams.id}, function (data) {
             $scope.recipe = data;
@@ -34,6 +34,7 @@ var recipeCtrl = recptr.controller('recipeCtrl', function ($scope, Recipe, $rout
 
     $scope.delete = function () {
             Recipe.delete({id: $scope.recipe.id}, function (data) {
+                $rootScope.loadData();
                 $location.path('/');
             });
         };
