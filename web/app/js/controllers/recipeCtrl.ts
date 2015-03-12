@@ -1,59 +1,68 @@
-var recipeCtrl = recptr.controller('recipeCtrl', function ($scope, Recipe, $routeParams, $route, $timeout, $location, $rootScope) {
-    if ($routeParams.id) {
-        Recipe.get({id: $routeParams.id}, function (data) {
-            $scope.recipe = data;
-        });
-    }
-    else {
-        $scope.recipe = new Recipe;
-        $scope.recipe.Title = 'Новый рецепт';
-        $scope.recipe.Description = 'Описание';
-        $scope.recipe.Url = '';
-        $scope.recipe.Picture = {};
-        $scope.recipe.TimeToCook = 0;
-        $scope.recipe.Ingredients = [];
-        $scope.recipe.Steps = [];
-    }
+interface recipeCtrlScope extends ng.IScope {
+    recipe: IRecipe;
+    save();
+    deleteRecipe();
+    addIngredient();
+    removeIngredient(key:number);
+    addStep();
+    removeStep(key:number);
+}
 
-    $scope.addMore = function () {
-        var recipe = {
-            "Title": "Recipe2",
-            "Url": "",
-            "Picture": "",
-            "Description": "desc",
-            "TimeToCook": 0,
-            "Ingredients": [],
-            "Steps": []
+class recipeCtrl {
+    constructor($scope:recipeCtrlScope,
+                Recipe:IRecipeResource,
+                $routeParams,
+                $location,
+                $rootScope:IReceptrRootScope) {
+        if ($routeParams.id) {
+            var recipe:IRecipe = $rootScope.recipes[$routeParams.id];
+        }
+        else {
+            var recipe:IRecipe = new Recipe;
+            recipe.Title = 'Новый рецепт';
+            recipe.Description = 'Описание';
+            recipe.Url = '';
+            recipe.Picture = new Picture;
+            recipe.TimeToCook = 0;
+            recipe.Ingredients = [];
+            recipe.Steps = [];
+        }
+        $scope.recipe = recipe;
+
+        $scope.save = function () {
+            $scope.recipe.$save().then(function () {
+                if (!$rootScope.hasOwnProperty($scope.recipe.id)) {
+                    $rootScope.loadData(function () {
+                        $location.path('/recipes/' + $scope.recipe.id);
+                    })
+                }
+                else {
+                    $location.path('/recipes/' + $scope.recipe.id);
+                }
+            });
         };
-        Recipe.save(recipe);
-    };
 
-    $scope.save = function () {
-        $scope.recipe.$save();
-    };
-
-    $scope.delete = function () {
-            Recipe.delete({id: $scope.recipe.id}, function (data) {
-                $rootScope.loadData();
+        $scope.deleteRecipe = function () {
+            Recipe.delete({id: $scope.recipe.id}, function () {
+                delete $rootScope.recipes[$scope.recipe.id];
                 $location.path('/');
             });
         };
 
-    $scope.addIngredient = function () {
-        $scope.recipe.Ingredients.push({Title: '', HowMuch: ''})
-    };
+        $scope.addIngredient = function () {
+            $scope.recipe.Ingredients.push(new Ingredient())
+        };
 
-    $scope.removeIngredient = function (key) {
-        $scope.recipe.Ingredients.splice(key, 1);
-    };
+        $scope.removeIngredient = function (key) {
+            $scope.recipe.Ingredients.splice(key, 1);
+        };
 
-    $scope.addStep = function () {
-        $scope.recipe.Steps.push({Title: '', Html: '', Picture: {}})
-    };
+        $scope.addStep = function () {
+            $scope.recipe.Steps.push(new Step)
+        };
 
-    $scope.removeStep = function (key) {
-        $scope.recipe.Steps.splice(key, 1);
-    };
-
-    console.log('123');
-});
+        $scope.removeStep = function (key) {
+            $scope.recipe.Steps.splice(key, 1);
+        };
+    }
+}

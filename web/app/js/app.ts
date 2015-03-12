@@ -1,16 +1,6 @@
 /// <reference path="../../typings/tsd.d.ts" />
-var apiUrl = '//'+location.hostname+':3000';
+var apiUrl = '//' + location.hostname + ':3000';
 // Declare app level module which depends on views, and components
-var recptr = angular.module('recptr', [
-    'ngRoute', 'ngMaterial', 'ngResource', 'naif.base64', 'ngMdIcons'
-]).
-    config(['$routeProvider', function ($routeProvider) {
-        $routeProvider
-            .when('/', buildWhen('index'))
-            .when('/recipes', buildWhen('recipeForm', 'recipeCtrl'))
-            .when('/recipes/:id', buildWhen('recipe', 'recipeCtrl'))
-            .when('/recipes/:id/edit', buildWhen('recipeForm', 'recipeCtrl'))
-    }]);
 
 var buildWhen = function (templateUrl, controllerName = null) {
     return {
@@ -19,61 +9,115 @@ var buildWhen = function (templateUrl, controllerName = null) {
     };
 };
 
-recptr.factory('Resource', ['$resource', '$rootScope', '$location', function ($resource, $rootScope, $location) {
-    return function (url, params, methods) {
-        var defaults = {
-            update: {method: 'put', isArray: false},
-            create: {method: 'post'}
+interface IReceptrRootScope extends ng.IRootScopeService {
+    loadData(callback:Function);
+    getRandom();
+    showFileDialog();
+    recipes:IRecipe[]
+}
+
+module receptr {
+    export class Module {
+        app:ng.IModule;
+
+        constructor(name:string, modules:Array< string >) {
+            this.app = angular.module(name, modules);
+        }
+
+        addController(name:string, controller:Function) {
+            this.app.controller(name, controller);
+        }
+
+        config(conf:any) {
+            this.app.config(conf);
+        }
+
+        run(run:any) {
+            this.app.run(run);
+        }
+
+        factory(name:string, factory:any) {
+            this.app.factory(name, factory);
+        }
+    }
+}
+
+module receptrApp {
+    var myApp = new receptr.Module('receptrApp', ['ngRoute', 'ngMaterial', 'ngResource', 'naif.base64', 'ngMdIcons']);
+    myApp.addController('mainCtrl', mainCtrl);
+    myApp.addController('recipeCtrl', recipeCtrl);
+    myApp.config(['$routeProvider', function ($routeProvider) {
+        $routeProvider
+            .when('/', buildWhen('index'))
+            .when('/recipes', buildWhen('recipeForm', 'recipeCtrl'))
+            .when('/recipes/:id', buildWhen('recipe', 'recipeCtrl'))
+            .when('/recipes/:id/edit', buildWhen('recipeForm', 'recipeCtrl'))
+    }]);
+    myApp.config(['$locationProvider', function ($locationProvider) {
+        $locationProvider
+            .html5Mode(true)
+            .hashPrefix('!');
+    }]);
+    myApp.run(function ($rootScope, Recipe:IRecipeResource, $location:ng.ILocationService, $timeout:ng.ITimeoutService) {
+
+        $rootScope.loadData = function (callback:Function) {
+            var recipes = Recipe.query();
+            $rootScope.recipes = {};
+            recipes.$promise.then(function () {
+                for (var key in recipes) {
+                    if (!recipes.hasOwnProperty(key) || recipes[key].id == undefined)continue;
+                    $rootScope.recipes[recipes[key].id] = recipes[key];
+                }
+                callback();
+            });
         };
 
-        methods = angular.extend(defaults, methods);
-
-        var resource = $resource(url, params, methods);
-
-        resource.prototype.$save = function () {
-            if (!this.id) {
-                return this.$create(function(){
-                $rootScope.loadData();
-                $location.path('/');
-                });
-            }
-            else {
-                return this.$update(function (data) {
-                    $rootScope.loadData();
-                });
-            }
+        $rootScope.getRandom = function () {
+            var recipe = $rootScope.recipes[Math.floor(Math.random() * $rootScope.recipes.length)];
+            $location.path('/recipes/' + recipe.id);
         };
 
-        return resource;
-    };
-}]);
+        $rootScope.showFileDialog = function (inputName) {
+            console.log(inputName);
+            document.getElementById(inputName).click();
+        };
 
-recptr.factory('Recipe', ['Resource', function ($resource) {
-    return $resource(apiUrl + "/recipes/:id", {id: '@id'});
-}]);
+        $rootScope.loadData(function(){});
+    });
 
-recptr.config(['$locationProvider', function ($locationProvider) {
-    $locationProvider
-        .html5Mode(true)
-        .hashPrefix('!');
-}]);
+    myApp.factory('Resource',
+        ($resource:ng.resource.IResourceService, $rootScope:IReceptrRootScope):ng.resource.IResourceService => {
 
-recptr.run(function ($rootScope, Recipe, $location) {
-    $rootScope.loadData = function () {
-        Recipe.query(function (data) {
-            $rootScope.recipes = data;
+            return function (url, params, methods) {
+                var defaults = {
+                    update: {method: 'put', isArray: false},
+                    create: {method: 'post'}
+                };
+
+                methods = angular.extend(defaults, methods);
+
+                var resource = $resource(url, params, methods);
+
+                resource.prototype.$save = function (callback) {
+                    if (!this.id) {
+                        return this.$create(function () {
+                        });
+                    }
+                    else {
+                        return this.$update(callback);
+                    }
+                };
+
+                return resource;
+            };
         });
-    };
 
-    $rootScope.getRandom = function () {
-        var recipe = $rootScope.recipes[Math.floor(Math.random() * $rootScope.recipes.length)];
-        $location.path('/recipes/' + recipe.id);
-    };
+    myApp.factory('Recipe',
+        ['Resource', ($resource:ng.resource.IResourceService):IRecipeResource => {
 
-    $rootScope.showFileDialog = function (inputName) {
-        console.log(inputName);
-        document.getElementById(inputName).click();
-    };
+            return <IRecipeResource> $resource(apiUrl + "/recipes/:id", {id: '@id'});
+        }]);
+}
 
-    $rootScope.loadData();
-});
+
+
